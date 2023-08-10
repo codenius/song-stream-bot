@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "dev": "deno run --watch --allow-all main.ts"
+  },
+  "imports": {
+    "oak": "https://deno.land/x/oak@v12.6.0/mod.ts",
+    "grammy": "https://deno.land/x/grammy@v1.17.2/mod.ts",
+    "grammy_conversations": "https://deno.land/x/grammy_conversations@v1.1.2/mod.ts",
+    "std/": "https://deno.land/std@0.197.0/",
+    "supabase-js": "https://esm.sh/@supabase/supabase-js@2.32.0",
+    "@grammyjs/storage-supabase": "https://raw.githubusercontent.com/codenius/grammyjs-storages/2ee63bf8839ac27c1ab288b9d8a96584ace1fdb9/packages/supabase/src/mod.ts" // temporary fix, https://deno.land/x/grammy_storages/supabase/src/mod.ts currently broken
+  }
+}
