@@ -56,8 +56,7 @@ bot.command("start", (ctx) => {
   ctx.reply("Hi there!");
 });
 bot.command("set", async (ctx) => {
-  if (ctx.match) ctx.session.spotifyLink = ctx.match;
-  else await ctx.conversation.enter("getSpotifyLink");
+  await ctx.conversation.enter("getSpotifyLink");
 });
 bot.command("link", (ctx) => {
   ctx.reply(
