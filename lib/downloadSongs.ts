@@ -1,4 +1,5 @@
 import { Song } from "./Song.ts";
+const songsFolder = "songs";
 
 export async function downloadSongs(spotifyLink: string | Song[]) {
   if (!spotifyLink) return;
@@ -9,12 +10,25 @@ export async function downloadSongs(spotifyLink: string | Song[]) {
     linkArray.push(spotifyLink);
   }
   console.log("Download started...");
+  await makeSongsDir(songsFolder);
   const cmd = new Deno.Command("spotdl", {
     args: ["download", ...linkArray],
-    cwd: "songs",
+    cwd: songsFolder,
   });
   const output = new TextDecoder().decode((await cmd.output()).stdout);
   console.log(output);
   console.log("Download completed.");
   return output;
+}
+
+async function makeSongsDir(songsFolder: string) {
+  try {
+    await Deno.stat(songsFolder);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      await Deno.mkdir(songsFolder, { recursive: true });
+    } else {
+      throw error;
+    }
+  }
 }
