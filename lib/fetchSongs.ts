@@ -24,7 +24,6 @@ export async function fetchSongs(spotifyLink: string, ctx: MyContext) {
       songsToDownload.push(newSong);
     }
   }
-  ctx.session.oldSongs = newSongs;
 
   return songsToDownload;
 }

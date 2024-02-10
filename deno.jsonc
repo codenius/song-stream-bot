@@ -4,7 +4,7 @@
   },
   "imports": {
     "oak": "https://deno.land/x/oak@v12.6.0/mod.ts",
-    "grammy": "https://deno.land/x/grammy@v1.17.2/mod.ts",
+    "grammy": "https://deno.land/x/grammy@v1.20.3/mod.ts",
     "grammy_conversations": "https://deno.land/x/grammy_conversations@v1.1.2/mod.ts",
     "std/": "https://deno.land/std@0.197.0/",
     "supabase-js": "https://esm.sh/@supabase/supabase-js@2.32.0",

@@ -8,11 +8,14 @@ import { songsRouter } from "./lib/sendSongs.ts";
 const SERVER_URL = Deno.env.get("SERVER_URL");
 const BOT_TOKEN = Deno.env.get("BOT_TOKEN");
 const PORT = 8000;
+const ALLOWED_UPDATES = ["message", "message_reaction"];
 const WEBHOOK_URL =
-  `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${SERVER_URL}webhook`;
+  `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${SERVER_URL}webhook&allowed_updates=${
+    JSON.stringify(ALLOWED_UPDATES)
+  }`;
 try {
   await fetch(WEBHOOK_URL);
-  console.log(`Successfully registered webhook to ${WEBHOOK_URL}.`);
+  console.log(`Successfully registered webhook to ${SERVER_URL}.`);
 } catch {
   console.log("Webhook registration failed.");
 }

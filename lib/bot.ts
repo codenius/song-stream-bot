@@ -23,10 +23,11 @@ interface SessionData {
   spotifyLink: string;
   oldSongs: Song[];
 }
-export type MyContext = Context &
-  SessionFlavor<SessionData> &
-  ConversationFlavor &
-  HydrateFlavor<Context>;
+export type MyContext =
+  & Context
+  & SessionFlavor<SessionData>
+  & ConversationFlavor
+  & HydrateFlavor<Context>;
 type MyConversation = Conversation<MyContext>;
 
 const bot = new Bot<MyContext>(BOT_TOKEN);
@@ -39,8 +40,10 @@ bot.use(conversations());
 bot.use(hydrate());
 
 async function getSpotifyLink(conversation: MyConversation, ctx: MyContext) {
-  await ctx.reply("Send a spotify link to watch!");
-  const { message } = await conversation.waitFor("::url");
+  await ctx.reply("Send a spotify link to watch!", {
+    reply_markup: { force_reply: true },
+  });
+  const { message } = await conversation.waitFor("message::url");
   conversation.session.spotifyLink = message?.text as string;
   await ctx.reply(`Thanks!`);
 }
@@ -69,20 +72,22 @@ async function createStatusMessage(ctx: MyContext, initialStatus: string) {
 }
 
 bot.command("start", (ctx) => {
-  ctx.reply("Hi there!");
+  ctx.reply(
+    "Hi there! You can resend a song by reacting with 👎 in case it is broken.",
+  );
 });
 bot.command("set", async (ctx) => {
   await ctx.conversation.enter("getSpotifyLink");
 });
 bot.command("link", (ctx) => {
   ctx.reply(
-    ctx.session.spotifyLink || "No spotify link stored. Set one with /set."
+    ctx.session.spotifyLink || "No spotify link stored. Set one with /set.",
   );
 });
 bot.command("fetch", async (ctx) => {
   const [setStatus, deleteStatus] = await createStatusMessage(
     ctx,
-    "Fetch triggered."
+    "Fetch triggered.",
   );
 
   if (ctx.session.spotifyLink) {
@@ -90,7 +95,7 @@ bot.command("fetch", async (ctx) => {
     const songsToDownload = await fetchSongs(ctx.session.spotifyLink, ctx);
     if (songsToDownload.length) {
       await setStatus(
-        `${songsToDownload.length} new songs found. Downloading...`
+        `${songsToDownload.length} new songs found. Downloading...`,
       );
       await downloadSongs(songsToDownload);
       await setStatus("Sending songs now...");
@@ -102,18 +107,35 @@ bot.command("fetch", async (ctx) => {
   } else {
     await setStatus("No spotify link stored. Set one with /set.");
   }
+  await ctx.react("👍");
   setTimeout(
     () =>
       deleteStatus().catch((e) => {
         console.error(e);
       }),
-    5000
+    5000,
   );
+});
+bot.reaction("👎", async (ctx) => {
+  const messageId = ctx.messageReaction.message_id;
+  const oldSongIndex = ctx.session.oldSongs.findIndex((song) =>
+    song.message_id == messageId
+  );
+
+  if (oldSongIndex != -1) {
+    const oldSong = ctx.session.oldSongs[oldSongIndex];
+    console.log(`Redownloading and sending ${oldSong.name}`);
+    ctx.session.oldSongs.splice(oldSongIndex, 1);
+
+    await downloadSongs(oldSong.url);
+    await sendSongs([oldSong], ctx);
+    await ctx.deleteMessage();
+  }
 });
 bot.command("reset", (ctx) => {
   ctx.session.oldSongs = [];
   ctx.reply(
-    "Successfully reset allready sent songs list. A new fetch will re-download all songs."
+    "Successfully reset allready sent songs list. A new fetch will re-download all songs.",
   );
 });
 

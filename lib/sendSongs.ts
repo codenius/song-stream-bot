@@ -1,4 +1,4 @@
-import { CommandContext, InputFile } from "grammy";
+import { InputFile } from "grammy";
 import { Router } from "oak";
 import { MyContext } from "./bot.ts";
 import { Song } from "./Song.ts";
@@ -10,7 +10,7 @@ const DIR = `${Deno.cwd()}/songs/`;
 
 export async function sendSongs(
   songsToSend: Song[],
-  ctx: CommandContext<MyContext>,
+  ctx: MyContext,
 ) {
   for await (const { isFile, name } of Deno.readDir(DIR)) {
     const songToSend = songsToSend.find((songToSend) =>
@@ -24,7 +24,9 @@ export async function sendSongs(
       const encoded = encodeURI(fileUrl);
       console.log("Sending", PERSIST_SONG_FILES ? encoded : name);
       const response = await ctx.replyWithAudio(new InputFile(filePath));
-      if (response.message_id && response.audio) {
+      const message_id = response.message_id;
+      if (message_id && response.audio) {
+        ctx.session.oldSongs.push({ ...songToSend, message_id });
         await Deno.remove(filePath);
       }
     }
