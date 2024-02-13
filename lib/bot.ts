@@ -129,7 +129,7 @@ bot.reaction("👎", async (ctx) => {
 
     await downloadSongs(oldSong.url);
     await sendSongs([oldSong], ctx);
-    await ctx.deleteMessage();
+    ctx.deleteMessage().catch(() => {});
   }
 });
 bot.command("reset", (ctx) => {
