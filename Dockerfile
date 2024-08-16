@@ -6,7 +6,8 @@ RUN apt update -y \
   && apt install bash curl unzip -y
 
 # Install spotdl package
-RUN pip install spotdl==4.2
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 RUN spotdl --download-ffmpeg
 
 # Install Deno
