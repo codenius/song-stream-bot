@@ -25,7 +25,7 @@ WORKDIR /app
 COPY . .
 
 # Cache dependencies
-RUN deno cache --lock deno.lock main.ts
+RUN deno cache --lock deno.lock --allow-import main.ts
 
 
 # Set up entry point
